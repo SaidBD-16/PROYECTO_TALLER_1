@@ -61,7 +61,7 @@ while option != "3":
                         #S: Una de las opciones validas "1, 2, 3, 4 o 5"
                         #R: Solo se deben ingresar opciones permitidas del menú
         
-                        if option == "11":
+                        while option == "11":
                             print("")
                             print("==========================================")
                             print("       GESTION DE MODELOS DE AUTOBUS      ")
@@ -75,7 +75,7 @@ while option != "3":
                             admin = input("Digite una opcion: ")
                             print("")
 
-                            if admin != "5":
+                            if admin:
 
                                 #E: modelo
                                 #S: Modelo incluido en el archivo
@@ -255,7 +255,9 @@ while option != "3":
                                             print("")
 
                                             linea = archivo.readline()
-                                                                
+                                            
+                                if admin == "5":
+                                    option = "5"                   
 
                         #E: option 12
                         #S: Una de las opciones validas "1, 2, 3, 4 o 5"
@@ -274,18 +276,239 @@ while option != "3":
                             admin = input("Digite una opcion: ")
                             print("")
 
-                            if admin != "5":
-                                if admin == "1":
-                                    pass
 
-                                if admin == "2":
-                                    pass
+                            
+                            #E: unidad
+                            #S: Unidad incluida en el archivo
+                            #R: La placa no se puede repetir y el modelo debe existir
+                            #Incluir 
+                            if admin == "1":
 
-                                if admin == "3":
-                                    pass
+                                placa = input("Placa: ")
+                                modelo = input("Modelo: ")
+                                año = input("Año: ")
+                                empresa = input("Empresa operadora: ")
+                                
+                                # las casillas no pueden estar vacias 
+                                if placa == "" or modelo == "" or año == "" or empresa == "":
+                                    print("No se puede agregar unidades vacias")
 
-                                if admin == "4":
+                                else:
+                                    modelo_existe = False
+                                    # se verifica que el modelo exista para poder incluir 
+                                    with open("modelos.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if modelo == datos[0]:
+                                                modelo_existe = True
+
+                                            linea = archivo.readline()
+
+                                    if modelo_existe == False:
+                                        print("El modelo no esta registrado")
+
+                                    else:
+                                        placa_existe = False
+                                        # verifica que la placa no se encuentre en el archivo unidades.txt
+                                        with open("unidades.txt", "r") as archivo:
+                                            linea = archivo.readline()
+
+                                            while linea != "":
+                                                datos = linea.strip().split(";")
+
+                                                if placa == datos[0]:
+                                                    placa_existe = True
+
+                                                linea = archivo.readline()
+                                        # no se añade
+                                        if placa_existe == True:
+                                            print("La placa ya esta registrada")
+
+                                        else:
+                                            # se agrega a un al archivo 
+                                            nuevo = placa + ";" + modelo + ";" + año + ";" + empresa
+
+                                            with open("unidades.txt", "a") as archivo:
+                                                archivo.write(nuevo + "\n")
+
+                                            print("Unidad agregada")
+
+
+                        
+                            #E: placa
+                            #S: Unidad eliminada del archivo
+                            #R: La unidad no puede estar asociada a una salida
+                            if admin == "2":
+
+                                placa = input("Placa de la unidad a eliminar: ")
+
+                                existe = False
+                                # verifica que la placa no este asociada
+                                with open("salidas.txt", "r") as archivo:
+                                    linea = archivo.readline()
+
+                                    while linea != "":
+                                        datos = linea.strip().split(";")
+
+                                        if placa == datos[2]:
+                                            existe = True
+
+                                        linea = archivo.readline()
+                                # no elimina 
+                                if existe == True:
+                                    print("La unidad esta asociada a una salida")
+
+                                else:
+                                    # forma nuevamente el contenido del archivo desde cero
+                                    nuevo = []
+
+                                    with open("unidades.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if datos[0] != placa:
+                                                nuevo += [linea]
+
+                                            linea = archivo.readline()
+                                    
+                                    # agrega el contenido nuevo al archivo
+                                    with open("unidades.txt", "w") as archivo:
+                                        i = 0
+
+                                        while i < len(nuevo):
+                                            archivo.write(nuevo[i])
+                                            i += 1
+
+                                    print("Unidad eliminada")
+
+
+                            
+                            #E: placa
+                            #S: archivo de unidades con los datos modificados
+                            #R: La unidad no puede estar asociada a una salida y el modelo debe existir
+                            if admin == "3":
+
+                                placa = input("Placa de la unidad a modificar: ")
+
+                                existe = False
+
+                                # Buscamos si la placa esta asociada a una salida
+                                with open("salidas.txt", "r") as archivo:
+                                    linea = archivo.readline()
+
+                                    while linea != "":
+                                        datos = linea.strip().split(";")
+
+                                        if placa == datos[2]:
+                                            existe = True
+
+                                        linea = archivo.readline()
+
+                                if existe == True:
+                                    print("La unidad esta asociada a una salida")
+
+                                else:
+
+                                    nuevo = []
+
+                                    # Buscamos los valores que se quieren modificar
+                                    with open("unidades.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if datos[0] == placa:
+
+                                                nueva_placa = input("Nueva placa: ")
+                                                nuevo_modelo = input("Nuevo modelo: ")
+                                                nuevo_año = input("Nuevo año: ")
+                                                nueva_empresa = input("Nueva empresa operadora: ")
+
+                                                # Si la placa esta vacia conserva la anterior
+                                                if nueva_placa == "":
+                                                    nueva_placa = datos[0]
+
+                                                else:
+                                                    placa_existe = False
+                                                    # de lo contrario busca que no exista 
+                                                    with open("unidades.txt", "r") as archivo_unidades:
+                                                        linea_unidad = archivo_unidades.readline()
+
+                                                        while linea_unidad != "":
+                                                            datos_unidad = linea_unidad.strip().split(";")
+
+                                                            if nueva_placa == datos_unidad[0] and nueva_placa != placa:
+                                                                placa_existe = True
+
+                                                            linea_unidad = archivo_unidades.readline()
+
+                                                    if placa_existe == True:
+                                                        print("La placa ya esta registrada")
+                                                        nueva_placa = datos[0]
+
+                                                # Si el modelo esta vacio conserva el anterior
+                                                if nuevo_modelo == "":
+                                                    nuevo_modelo = datos[1]
+
+                                                else:
+                                                    modelo_existe = False
+                                                    # busca que el modelo exista en modelo.txt
+                                                    with open("modelos.txt", "r") as archivo_modelos:
+                                                        linea_modelo = archivo_modelos.readline()
+
+                                                        while linea_modelo != "":
+                                                            datos_modelo = linea_modelo.strip().split(";")
+
+                                                            if nuevo_modelo == datos_modelo[0]:
+                                                                modelo_existe = True
+
+                                                            linea_modelo = archivo_modelos.readline()
+                                                    # no modifica el modelo 
+                                                    if modelo_existe == False:
+                                                        print("El modelo no esta registrado")
+                                                        nuevo_modelo = datos[1]
+
+                                                # Si el año esta vacio conserva el anterior
+                                                if nuevo_año == "":
+                                                    nuevo_año = datos[2]
+
+                                                # Si la empresa esta vacia conserva la anterior
+                                                if nueva_empresa == "":
+                                                    nueva_empresa = datos[3]
+
+                                                unidad = nueva_placa + ";" + nuevo_modelo + ";" + nuevo_año + ";" + nueva_empresa + "\n"
+
+                                                nuevo += [unidad]
+
+                                            else:
+                                                # si no se encuentra la placa se mantiene 
+                                                nuevo += [linea]
+
+                                            linea = archivo.readline()
+                                    # agrega todos los datos a unidades.txt
+                                    with open("unidades.txt", "w") as archivo:
+                                        i = 0
+
+                                        while i < len(nuevo):
+                                            archivo.write(nuevo[i])
+                                            i += 1
+
+                                    print("Unidad modificada")
+
+
+
+
+                                    
+                            if admin == "4":
                                     pass
+                            if admin == "5":
+                                option = "5"
                                 
                         if option == "13":
                             print("")
