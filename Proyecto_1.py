@@ -7,6 +7,9 @@ admin = ""
 
 while option != "3":
     print("")
+    print("==========================================")
+    print("              MENU PRINCIPAL              ")
+    print("==========================================")
     print("(1) Opciones Administrativas")
     print("(2) Opciones de Usuario")
     print("(3) Salir")
@@ -88,7 +91,7 @@ while option != "3":
                                     cantidad_de_asientos   = input("Cantidad de asientos: ")
                                     cantidad_espacios_pie  = input("Cantidad de espacios de pie: ")
 
-                                    modelo                 = descripcion_del_modelo + ";" + marca + ";" + cantidad_de_asientos + ";" + cantidad_espacios_pie
+                                    modelo = descripcion_del_modelo + ";" + marca + ";" + cantidad_de_asientos + ";" + cantidad_espacios_pie 
 
                                     existe = False
 
@@ -100,14 +103,16 @@ while option != "3":
                                         while linea != "":
                                             datos = linea.strip().split(";")
 
-                                        if datos[0] == descripcion_del_modelo:
-                                            print("Ya esta agregado")
-                                            existe = True
+                                            if datos[0] == descripcion_del_modelo:
+                                                existe = True
 
-                                        linea = archivo.readline()
-                                        
-                                    with open("modelos.txt", "a") as archivo:
-                                        archivo.write(modelo + "\n")
+                                            linea = archivo.readline()
+                                            
+                                    if existe == True:
+                                        print("Ya esta incluido")
+                                    else:
+                                        with open("modelos.txt", "a") as archivo:
+                                            archivo.write("\n" + modelo)
 
 
                                 #E: descripcion
@@ -143,7 +148,7 @@ while option != "3":
                                             while linea != "":
                                                 datos = linea.strip().split(";")
 
-                                                if datos[1] != descripcion_del_modelo:
+                                                if datos[0] != descripcion_del_modelo:
                                                     nuevo += [linea]
 
                                                 linea = archivo.readline()
@@ -153,7 +158,7 @@ while option != "3":
 
                                             while i < len(nuevo):
                                                 archivo.write(nuevo[i])
-                                                posicion += 1
+                                                i += 1
 
                                         print("Modelo eliminado")
                                         
@@ -244,10 +249,10 @@ while option != "3":
                                         while linea != "":
                                             datos = linea.strip().split(";")
 
-                                            print("")
-                                            print("==========================================")
+                                            
+                                            print("------------------------------------------")
                                             print("             MODELO DE AUTOBUS            ")
-                                            print("==========================================")
+                                            print("------------------------------------------")
                                             print("Descripcion: " + datos[0])
                                             print("Marca: " + datos[1])
                                             print("Cantidad de asientos: " + datos[2])
@@ -262,7 +267,7 @@ while option != "3":
                         #E: option 12
                         #S: Una de las opciones validas "1, 2, 3, 4 o 5"
                         #R: Solo se deben ingresar opciones permitidas del menú   
-                        if option == "12":
+                        while option == "12":
                             print("")
                             print("==========================================")
                             print("            GESTION DE UNIDADES           ")
@@ -332,9 +337,10 @@ while option != "3":
                                             nuevo = placa + ";" + modelo + ";" + año + ";" + empresa
 
                                             with open("unidades.txt", "a") as archivo:
-                                                archivo.write(nuevo + "\n")
+                                                archivo.write("\n" + nuevo)
 
                                             print("Unidad agregada")
+                                        
 
 
                         
@@ -430,9 +436,13 @@ while option != "3":
                                                 nuevo_año = input("Nuevo año: ")
                                                 nueva_empresa = input("Nueva empresa operadora: ")
 
+
+
                                                 # Si la placa esta vacia conserva la anterior
                                                 if nueva_placa == "":
                                                     nueva_placa = datos[0]
+
+
 
                                                 else:
                                                     placa_existe = False
@@ -452,9 +462,13 @@ while option != "3":
                                                         print("La placa ya esta registrada")
                                                         nueva_placa = datos[0]
 
+
+
                                                 # Si el modelo esta vacio conserva el anterior
                                                 if nuevo_modelo == "":
                                                     nuevo_modelo = datos[1]
+
+
 
                                                 else:
                                                     modelo_existe = False
@@ -469,14 +483,21 @@ while option != "3":
                                                                 modelo_existe = True
 
                                                             linea_modelo = archivo_modelos.readline()
+
+
+
                                                     # no modifica el modelo 
                                                     if modelo_existe == False:
                                                         print("El modelo no esta registrado")
                                                         nuevo_modelo = datos[1]
 
+
+
                                                 # Si el año esta vacio conserva el anterior
                                                 if nuevo_año == "":
                                                     nuevo_año = datos[2]
+
+
 
                                                 # Si la empresa esta vacia conserva la anterior
                                                 if nueva_empresa == "":
@@ -505,12 +526,35 @@ while option != "3":
 
 
                                     
+                            
+                            #E: Ninguna
+                            #S: muestra los modelos
+                            #R: ninguna
+                            #Mostrar 
                             if admin == "4":
-                                    pass
+                                # recorre el archivo linea por linea mientras cada linea la hace una linea para poner las posiciones de la lista en cada print
+                                with open("unidades.txt", "r") as archivo:
+                                    linea = archivo.readline()
+
+                                    while linea != "":
+                                        datos = linea.strip().split(";")
+
+                                        
+                                        print("------------------------------------------")
+                                        print("                  UNIDAD                  ")
+                                        print("------------------------------------------")
+                                        print("Placa: " + datos[0])
+                                        print("Modelo: " + datos[1])
+                                        print("año: " + datos[2])
+                                        print("Empresa operadora: " + datos[3])
+                                        print("")
+
+                                        linea = archivo.readline()
+                                        
                             if admin == "5":
                                 option = "5"
                                 
-                        if option == "13":
+                        while option == "13":
                             print("")
                             print("==========================================")
                             print("            GESTION DE CONDUCTORES        ")
@@ -524,18 +568,226 @@ while option != "3":
                             admin = input("Digite una opcion: ")
                             print("")
 
-                            if admin != "5":
-                                if admin == "1":
-                                    pass
 
-                                if admin == "2":
-                                    pass
 
-                                if admin == "3":
-                                    pass
+                            #E: datos del conductor
+                            #S: Conductor incluido en el archivo
+                            #R: La cedula no se puede repetir y ningun campo puede estar vacio
+                            if admin == "1":
 
-                                if admin == "4":
-                                    pass
+                                cedula = input("Cedula: ")
+                                nombre = input("Nombre completo: ")
+                                licencia = input("Tipo de licencia: ")
+                                fecha = input("Fecha de vencimiento: ")
+                                jornada = input("Jornada maxima diaria: ")
+
+                                if cedula == "" or nombre == "" or licencia == "" or fecha == "" or jornada == "":
+                                    print("No se puede agregar el conductor, ningun campo puede quedar vacio")
+
+                                else:
+
+                                    existe = False
+                                    #Verifica que la cedula no se encuentre en el atchivo conductores.txt
+                                    with open("conductores.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if cedula == datos[0]:
+                                                existe = True
+
+                                            linea = archivo.readline()
+                                    # no se agrega 
+                                    if existe == True:
+                                        print("La cedula ya esta registrada")
+
+                                    else:
+                                        # se añade al archivo
+                                        conductor = cedula + ";" + nombre + ";" + licencia + ";" + fecha + ";" + jornada
+
+                                        with open("conductores.txt", "a") as archivo:
+                                            archivo.write(conductor + "\n")
+
+                                        print("Conductor agregado")
+
+                                        
+                            #E: cedula
+                            #S: Archivo de conductores con el conductor eliminado
+                            #R: El conductor no puede estar asociado a una salida
+
+                            if admin == "2":
+
+                                cedula = input("Cedula del conductor a eliminar: ")
+
+                                existe = False
+                                # valida que la cedula a eliminar no se encuentre en el archivo salidas.txt
+                                with open("salidas.txt", "r") as archivo:
+                                    linea = archivo.readline()
+
+                                    while linea != "":
+                                        datos = linea.strip().split(";")
+
+                                        if cedula == datos[3]:
+                                            existe = True
+
+                                        linea = archivo.readline()
+                                # no elimina 
+                                if existe == True:
+                                    print("El conductor esta asociado a una salida")
+
+                                else:
+
+                                    nuevo = []
+                                    # mientras cada linea sea distinta a la asignada se agregara a nuevo
+                                    with open("conductores.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if datos[0] != cedula:
+                                                nuevo += [linea]
+
+                                            linea = archivo.readline()
+                                    # rescribe el archivo 
+                                    with open("conductores.txt", "w") as archivo:
+                                        i = 0
+
+                                        while i < len(nuevo):
+                                            archivo.write(nuevo[i])
+                                            i += 1
+
+                                    print("Conductor eliminado")
+
+
+
+
+                            #E: cedula
+                            #S: Archivo de conductores con los datos modificados
+                            #R: El conductor no puede estar asociado a una salida y la cedula no se puede repetir
+
+                            if admin == "3":
+
+                                cedula = input("Cedula del conductor a modificar: ")
+
+                                existe = False
+
+                                # Buscamos si el conductor esta asociado a una salida
+                                with open("salidas.txt", "r") as archivo:
+                                    linea = archivo.readline()
+
+                                    while linea != "":
+                                        datos = linea.strip().split(";")
+
+                                        if cedula == datos[3]:
+                                            existe = True
+
+                                        linea = archivo.readline()
+                                # no se modifica
+                                if existe == True:
+                                    print("El conductor esta asociado a una salida")
+
+                                else:
+
+                                    nuevo = []
+                                    # se sustituira linea seleccionada por la nueva 
+                                    with open("conductores.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if datos[0] == cedula:
+
+                                                nueva_cedula = input("Nueva cedula: ")
+                                                nuevo_nombre = input("Nuevo nombre completo: ")
+                                                nueva_licencia = input("Nuevo tipo de licencia: ")
+                                                nueva_fecha = input("Nueva fecha de vencimiento: ")
+                                                nueva_jornada = input("Nueva jornada maxima diaria: ")
+
+                                                # Valida que no se encuentre vacia
+                                                if nueva_cedula == "":
+                                                    nueva_cedula = datos[0]
+
+                                                else:
+                                                    cedula_existe = False
+                                                    # valida que la cedula ingresada no deba coisidir con la nueva que se digito
+                                                    with open("conductores.txt", "r") as archivo_conductores:
+                                                        linea_conductor = archivo_conductores.readline()
+
+                                                        while linea_conductor != "":
+                                                            datos_conductor = linea_conductor.strip().split(";")
+
+                                                            if nueva_cedula == datos_conductor[0] and nueva_cedula != cedula:
+                                                                cedula_existe = True
+
+                                                            linea_conductor = archivo_conductores.readline()
+
+                                                    if cedula_existe == True:
+                                                        print("La cedula ya esta registrada")
+                                                        nueva_cedula = datos[0]
+                                              
+                                                # valida que los ningun dato quede vacio
+                                                if nuevo_nombre == "":
+                                                    nuevo_nombre = datos[1]
+
+                                                if nueva_licencia == "":
+                                                    nueva_licencia = datos[2]
+
+                                                if nueva_fecha == "":
+                                                    nueva_fecha = datos[3]
+
+                                                if nueva_jornada == "":
+                                                    nueva_jornada = datos[4]
+                                                #añade
+                                                conductor = nueva_cedula + ";" + nuevo_nombre + ";" + nueva_licencia + ";" + nueva_fecha + ";" + nueva_jornada + "\n"
+
+                                                nuevo += [conductor]
+
+                                            else:
+                                                # no se modifica esa linea, sigue con la siguiente 
+                                                nuevo += [linea]
+
+                                            linea = archivo.readline()
+                                    # rescribe el archivo con los datos modificados
+                                    with open("conductores.txt", "w") as archivo:
+                                        i = 0
+
+                                        while i < len(nuevo):
+                                            archivo.write(nuevo[i])
+                                            i += 1
+
+                                    print("Conductor modificado")
+
+
+                            #E: Ninguna
+                            #S: muestra los conductores
+                            #R: ninguna
+                            #Mostrar 
+                            if admin == "4":
+                                 with open("conductores.txt", "r") as archivo:
+                                    linea = archivo.readline()
+
+                                    while linea != "":
+                                        datos = linea.strip().split(";")
+                                        
+                                        print("------------------------------------------")
+                                        print("                CONDUCTORES               ")
+                                        print("------------------------------------------")
+                                        print("Cedula: " + datos[0])
+                                        print("Nombre completo: " + datos[1])
+                                        print("Tipo de licencia: " + datos[2])
+                                        print("Fecha de vencimiento: " + datos[3])
+                                        print("Jornada maxima diaria: " + datos[4])
+                                        print("")
+
+                                        linea = archivo.readline()
+
+
+                                        
+                            if admin == "5":
+                                option = "5"
                                 
                         if option == "14":
                             print("")
