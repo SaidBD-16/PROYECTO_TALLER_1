@@ -1,0 +1,5 @@
+LIM-SJO;1;Terminal Limón;0
+LIM-SJO;2;Liverpool;12
+LIM-SJO;3;Siquirres;60
+LIM-SJO;4;Guápiles;100
+LIM-SJO;5;Terminal San José;160

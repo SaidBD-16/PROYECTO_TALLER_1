@@ -788,8 +788,10 @@ while option != "3":
                                         
                             if admin == "5":
                                 option = "5"
-                                
-                        if option == "14":
+
+
+                
+                        while option == "14":
                             print("")
                             print("==========================================")
                             print("              GESTION DE RUTAS            ")
@@ -803,19 +805,267 @@ while option != "3":
                             admin = input("Digite una opcion: ")
                             print("")
 
+
+
+                            #E: codigo de ruta, lugar de origen, lugar de destino, distancia total en kilómetros y tarifa por kilómetro
+                            #S: los datos agregados al archivo de rutas 
+                            #R: La cedula no se puede repetir y ningun campo puede estar vacio
                             if admin != "5":
                                 if admin == "1":
-                                    pass
+                                    codigo_ruta = input("Codigo de ruta: ")
+                                    lugar_origen = input("Lugar de origen: ")
+                                    lugar_destino = input("Lugar de destino: ")
+                                    distancia_total = input("Distancia total en kilómetros: ")
+                                    tarifa_por_kilometro = input("Tarifa por kilómetro: ")
+
+                                    if codigo_ruta == "" or lugar_origen == "" or lugar_destino == "" or distancia_total == "" or tarifa_por_kilometro == "":
+                                        print("No se puede agregar la ruta, ningun campo puede quedar vacio")
+
+                                    else:
+
+                                        existe = False
+                                        #Verifica que la ruta no se encuentre en el archivo rutas.txt
+                                        with open("rutas.txt", "r") as archivo:
+                                            linea = archivo.readline()
+
+                                            while linea != "":
+                                                datos = linea.strip().split(";")
+
+                                                if codigo_ruta == datos[0]:
+                                                    existe = True
+
+                                                linea = archivo.readline()
+                                        # no se agrega 
+                                        if existe == True:
+                                            print("El codigo de ruta ya esta registrada")
+
+                                        else:
+                                            # se añade al archivo
+                                            ruta = codigo_ruta + ";" + lugar_origen + ";" + lugar_destino + ";" + distancia_total + ";" + tarifa_por_kilometro
+
+                                            with open("rutas.txt", "a") as archivo:
+                                                archivo.write(ruta + "\n")
+
+                                            print("Ruta agregado")
+
+
+                               
+                                #E: codigo de ruta 
+                                #S: El archivo sin la linea asignada
+                                #R: La ruta no puede estar asociado a una salida
 
                                 if admin == "2":
-                                    pass
+
+                                    codigo_ruta = input("Codigo de ruta a eliminar: ")
+
+                                    existe = False
+                                    # valida que el codigo de ruta a eliminar no se encuentre en el archivo salidas.txt ni paradas.txt
+                                    # archivo de salidas
+                                    with open("salidas.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if codigo_ruta == datos[1]:
+                                                existe = True
+
+                                            linea = archivo.readline()
+
+                                    #archivo de paradas 
+                                    with open("paradas.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if codigo_ruta == datos[0]:
+                                                existe = True
+
+                                            linea = archivo.readline()
+                                            
+                                    # no elimina 
+                                    if existe == True:
+                                        print("El codigo de ruta tinen paradas registradas o salidad programadas")
+
+                                    else:
+
+                                        nuevo = []
+                                        # mientras cada linea sea distinta a la asignada se agregara a nuevo
+                                        with open("rutas.txt", "r") as archivo:
+                                            linea = archivo.readline()
+
+                                            while linea != "":
+                                                datos = linea.strip().split(";")
+
+                                                if datos[0] != codigo_ruta:
+                                                    nuevo += [linea]
+
+                                                linea = archivo.readline()
+                                        # rescribe el archivo 
+                                        with open("rutas.txt", "w") as archivo:
+                                            i = 0
+
+                                            while i < len(nuevo):
+                                                archivo.write(nuevo[i])
+                                                i += 1
+
+                                        print("Ruta eliminada")
+
+
+
+
+                                
+                                #E: Codigo de ruta
+                                #S: Archivo de rutas con los datos modificados
+                                #R: El codigo de ruta no puede estar asociado a una salida o con paradas registradas
 
                                 if admin == "3":
-                                    pass
 
+                                    codigo_ruta = input("El codigo de ruta a modificar: ")
+
+                                    existe = False
+
+                                    # Buscamos si el codigo esta asociado a una salida
+                                    with open("salidas.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if codigo_ruta == datos[1]:
+                                                existe = True
+
+                                            linea = archivo.readline()
+
+                                    # Buscamos si el codigo esta asociado a una parada
+                                    with open("paradas.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            if codigo_ruta == datos[0]:
+                                                existe = True
+
+                                            linea = archivo.readline()
+
+                                    # No se modifica
+                                    if existe == True:
+                                        print("El codigo de ruta esta asociado a una salida o con paradas registradas")
+
+                                    else:
+
+                                        nuevo = []
+
+                                        # Se sustituira la linea seleccionada por la nueva
+                                        with open("rutas.txt", "r") as archivo:
+                                            linea = archivo.readline()
+
+                                            while linea != "":
+                                                datos = linea.strip().split(";")
+
+                                                if datos[0] == codigo_ruta:
+
+                                                    nuevo_codigo = input("Nuevo codigo de ruta: ")
+                                                    nuevo_origen = input("Nuevo lugar de origen: ")
+                                                    nuevo_destino = input("Nuevo lugar de destino: ")
+                                                    nueva_dis_total_k = input("Nueva distancia total de kilometros: ")
+                                                    nueva_tarifa = input("Nueva tarifa por kilometro: ")
+
+                                                    # Si queda vacio conserva el dato anterior
+                                                    if nuevo_codigo == "":
+                                                        nuevo_codigo = datos[0]
+
+                                                    if nuevo_origen == "":
+                                                        nuevo_origen = datos[1]
+
+                                                    if nuevo_destino == "":
+                                                        nuevo_destino = datos[2]
+
+                                                    if nueva_dis_total_k == "":
+                                                        nueva_dis_total_k = datos[3]
+                                                    elif nueva_dis_total_k.isdigit() == False:
+                                                        print("La distancia debe contener solamente numeros")
+                                                        nueva_dis_total_k = datos[3]
+
+                                                    if nueva_tarifa == "":
+                                                        nueva_tarifa = datos[4]
+                                                    elif nueva_tarifa.isdigit() == False:
+                                                        print("La tarifa debe contener solamente numeros")
+                                                        nueva_tarifa = datos[4]
+
+                                                    # Verificamos que el nuevo codigo no exista
+                                                    codigo_repetido = False
+
+                                                    if nuevo_codigo != datos[0]:
+
+                                                        with open("rutas.txt", "r") as archivo2:
+                                                            linea2 = archivo2.readline()
+
+                                                            while linea2 != "":
+                                                                datos2 = linea2.strip().split(";")
+
+                                                                if nuevo_codigo == datos2[0]:
+                                                                    codigo_repetido = True
+
+                                                                linea2 = archivo2.readline()
+
+                                                        if codigo_repetido == True:
+                                                            print("El codigo de ruta ya existe")
+                                                            nuevo_codigo = datos[0]
+
+                                                    ruta = nuevo_codigo + ";" + nuevo_origen + ";" + nuevo_destino + ";" + nueva_dis_total_k + ";" + nueva_tarifa + "\n"
+
+                                                    nuevo += [ruta]
+
+                                                else:
+                                                    # añade la linea a nuevo 
+                                                    nuevo += [linea]
+                                                # sigue con la siguiente linea 
+                                                linea = archivo.readline()
+                                                
+                                        # agrega linea por linea al archivo 
+                                        with open("rutas.txt", "w") as archivo:
+                                            i = 0
+
+                                            while i < len(nuevo):
+                                                archivo.write(nuevo[i])
+                                                i += 1
+
+                                        print("Ruta modificada correctamente")
+
+
+
+
+                                #E: Ninguna
+                                #S: muestra las rutas
+                                #R: ninguna
+                                #Mostrar 
                                 if admin == "4":
-                                    pass
-                        if option == "15":
+                                     with open("rutas.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+                                            
+                                            print("------------------------------------------")
+                                            print("                   RUTAS                  ")
+                                            print("------------------------------------------")
+                                            print("Codigo de ruta: " + datos[0])
+                                            print("Lugar de origen: " + datos[1])
+                                            print("Lugar de destino: " + datos[2])
+                                            print("Distancia total en kilometros: " + datos[3])
+                                            print("Tarifa por kilometro: " + datos[4])
+                                            print("")
+
+                                            linea = archivo.readline()
+
+
+
+
+                                
+                        while option == "15":
                             print("")
                             print("==========================================")
                             print("        GESTION DE PARADAS POR RUTA       ")
@@ -829,18 +1079,20 @@ while option != "3":
                             admin = input("Digite una opcion: ")
                             print("")
 
-                            if admin != "5":
-                                if admin == "1":
-                                    pass
+                            
+                            if admin == "1":
+                                pass
 
-                                if admin == "2":
-                                    pass
+                            if admin == "2":
+                                pass
 
-                                if admin == "3":
-                                    pass
+                            if admin == "3":
+                                pass
 
-                                if admin == "4":
-                                    pass
+                            if admin == "4":
+                                pass
+                            if admin == "5":
+                                option = "5"
                                 
                         if option == "16":
                             print("")

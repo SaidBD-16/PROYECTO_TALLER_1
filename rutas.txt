@@ -1,0 +1,3 @@
+LIM-SJO;Limón;San José;160;35
+LIM-CAH;Limón;Cahuita;45;40
+LIM-SIQ;Limón;Siquirres;60;38
