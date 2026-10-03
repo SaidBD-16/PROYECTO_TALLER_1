@@ -1495,6 +1495,10 @@ while option != "3":
                                                             with open("paradas.txt", "r") as archivo_paradas:
                                                                 linea_parada = archivo_paradas.readline()
 
+
+
+
+
                                                                 while linea_parada != "":
                                                                     datos_parada = linea_parada.strip().split(";")
 
@@ -1503,6 +1507,7 @@ while option != "3":
                                                                         # no compara la parada que estamos modificando
                                                                         if not (codigo_ruta == datos_parada[0] and numero_orden == datos_parada[1]):
 
+                                                                            # busca si el orden ya existe y encuentra la parada anterior y siguiente para validar los kilometros
                                                                             orden_actual = int(datos_parada[1])
                                                                             kilometro_actual = int(datos_parada[3])
 
@@ -1523,6 +1528,10 @@ while option != "3":
 
                                                                     linea_parada = archivo_paradas.readline()
 
+
+
+
+                                                            # valida que el numero de orden no se repita y que los kilometros sean correctos segun las paradas anteriores y siguientes
                                                             if orden_repetido == True:
                                                                 print("El numero de orden ya esta registrado")
                                                                 nuevo_orden = datos[1]
@@ -1548,6 +1557,10 @@ while option != "3":
                                                                 nuevo_orden = datos[1]
                                                                 nuevo_kilometro = datos[3]
 
+
+
+
+
                                                     parada = nuevo_codigo + ";" + nuevo_orden + ";" + nuevo_nombre + ";" + nuevo_kilometro + "\n"
 
                                                     nuevo += [parada]
@@ -1556,6 +1569,7 @@ while option != "3":
                                                     nuevo += [linea]
 
                                                 linea = archivo.readline()
+                                                
                                         # lo agrega al archivo paradas.txt
                                         with open("paradas.txt", "w") as archivo:
                                             i = 0
@@ -1619,7 +1633,6 @@ while option != "3":
                                 #E: datos de la salida
                                 #S: Salida incluida en el archivo
                                 #R: La salida debe cumplir todas las validaciones establecidas
-
                                 if admin == "1":
 
                                     codigo_ruta = input("Codigo de ruta: ")
@@ -1629,69 +1642,120 @@ while option != "3":
                                     hora_salida = input("Hora de salida: ")
                                     hora_llegada = input("Hora estimada de llegada: ")
 
-                                    # valida que las casillas no esten vacias 
-                                    if codigo_ruta == "" or placa == "" or cedula == "" or fecha == "" or hora_salida == "" or hora_llegada == "":
-                                        print("No se puede agregar la salida, ningun campo puede quedar vacio")
 
-                                    # verifica que el formato de la fecha sea correcto
-                                    elif validar_fecha(fecha) == False:
-                                        print("La fecha no es valida")
+                                    ruta_existe = False
+                                    unidad_existe = False
 
-                                    # valida que el formato de la hora sea correcto
-                                    elif validar_hora(hora_salida) == False or validar_hora(hora_llegada) == False:
-                                        print("La hora no es valida")
+                                    with open("rutas.txt", "r") as archivo_rutas:
+                                        linea_ruta = archivo_rutas.readline()
+
+                                        while linea_ruta != "":
+                                            datos_ruta = linea_ruta.strip().split(";")
+
+                                            if codigo_ruta == datos_ruta[0]:
+                                                ruta_existe = True
+
+                                            linea_ruta = archivo_rutas.readline()
+
+
+                                    with open("unidades.txt", "r") as archivo_unidades:
+                                        linea_unidad = archivo_unidades.readline()
+
+                                        while linea_unidad != "":
+                                            datos_unidad = linea_unidad.strip().split(";")
+
+                                            if placa == datos_unidad[0]:
+                                                unidad_existe = True
+
+                                            linea_unidad = archivo_unidades.readline()
+
+                                    if ruta_existe == False:
+                                        print("La ruta no esta registrada")
+
+                                    elif unidad_existe == False:
+                                        print("La unidad no esta registrada")
+
                                     else:
-                                        if validar_hora(hora_salida) == False or validar_hora(hora_llegada) == False:
-                                            print("La hora no es valida")
+                                        # valida que las casillas no esten vacias 
+                                        if codigo_ruta == "" or placa == "" or cedula == "" or fecha == "" or hora_salida == "" or hora_llegada == "":
+                                            print("No se puede agregar la salida, ningun campo puede quedar vacio")
 
+                                        # verifica que el formato de la fecha sea correcto
+                                        elif validar_fecha(fecha) == False:
+                                            print("La fecha no es valida")
+
+                                        # valida que el formato de la hora sea correcto
+                                        elif validar_hora(hora_salida) == False or validar_hora(hora_llegada) == False:
+                                            print("La hora no es valida")
+                                    
                                         else:
+                                            # convierte las horas a minutos y verifica que la hora de llegada sea posterior a la salida
+                                            minutos_salida = int(hora_salida[0] + hora_salida[1]) * 60 + int(hora_salida[3] + hora_salida[4])
+
+                                            minutos_llegada = int(hora_llegada[0] + hora_llegada[1]) * 60 + int(hora_llegada[3] + hora_llegada[4])
+
+                                            if minutos_llegada <= minutos_salida:
+                                                print("La hora de llegada debe ser posterior a la hora de salida")
 
                                             else:
 
-                                                minutos_salida = int(hora_salida[0] + hora_salida[1]) * 60 + int(hora_salida[3] + hora_salida[4])
+                                                traslape_unidad = False
+                                                traslape_conductor = False
 
-                                                minutos_llegada = int(hora_llegada[0] + hora_llegada[1]) * 60 + int(hora_llegada[3] + hora_llegada[4])
+                                                # verifica que la unidad y el conductor no tengan otra salida en el mismo horario
+                                                with open("salidas.txt", "r") as archivo:
+                                                    linea = archivo.readline()
 
-                                                if minutos_llegada <= minutos_salida:
-                                                    print("La hora de llegada debe ser posterior a la hora de salida")
+                                                    while linea != "":
+                                                        datos = linea.strip().split(";")
 
-                                                else:
+                                                        if datos[4] == fecha:
 
-                                                    traslape_unidad = False
-                                                    traslape_conductor = False
+                                                            otra_salida = int(datos[5][0] + datos[5][1]) * 60 + int(datos[5][3] + datos[5][4])
 
-                                                    with open("salidas.txt", "r") as archivo:
+                                                            otra_llegada = int(datos[6][0] + datos[6][1]) * 60 + int(datos[6][3] + datos[6][4])
+
+                                                            if placa == datos[2]:
+                                                                if minutos_salida < otra_llegada and minutos_llegada > otra_salida:
+                                                                    traslape_unidad = True
+
+                                                            if cedula == datos[3]:
+                                                                if minutos_salida < otra_llegada and minutos_llegada > otra_salida:
+                                                                    traslape_conductor = True
+
                                                         linea = archivo.readline()
 
-                                                        while linea != "":
-                                                            datos = linea.strip().split(";")
+                                                # verifica si la unidad o el conductor tienen otra salida en ese horario
+                                                if traslape_unidad == True:
+                                                    print("La unidad ya tiene otra salida en ese horario")
 
-                                                            if datos[4] == fecha:
+                                                elif traslape_conductor == True:
+                                                    print("El conductor ya tiene otra salida en ese horario")
 
-                                                                otra_salida = int(datos[5][0] + datos[5][1]) * 60 + int(datos[5][3] + datos[5][4])
+                                                else:
+                                                    conductor_existe = False
+                                                    jornada_maxima = 0
+                                                    fecha_vencimiento = ""
 
-                                                                otra_llegada = int(datos[6][0] + datos[6][1]) * 60 + int(datos[6][3] + datos[6][4])
+                                                    with open("conductores.txt", "r") as archivo_conductores:
+                                                        linea_conductor = archivo_conductores.readline()
 
-                                                                if placa == datos[2]:
-                                                                    if minutos_salida < otra_llegada and minutos_llegada > otra_salida:
-                                                                        traslape_unidad = True
+                                                        while linea_conductor != "":
+                                                            datos_conductor = linea_conductor.strip().split(";")
 
-                                                                if cedula == datos[3]:
-                                                                    if minutos_salida < otra_llegada and minutos_llegada > otra_salida:
-                                                                        traslape_conductor = True
+                                                            if cedula == datos_conductor[0]:
+                                                                conductor_existe = True
+                                                                jornada_maxima = int(datos_conductor[4])
+                                                                fecha_vencimiento = datos_conductor[3]
 
-                                                            linea = archivo.readline()
+                                                            linea_conductor = archivo_conductores.readline()
 
-                                                    if traslape_unidad == True:
-                                                        print("La unidad ya tiene otra salida en ese horario")
-
-                                                    elif traslape_conductor == True:
-                                                        print("El conductor ya tiene otra salida en ese horario")
-
+                                                    if conductor_existe == False:
+                                                        print("El conductor no esta registrado")
                                                     else:
-
                                                         horas_conductor = 0
-
+                                                        
+                                                        # suma las horas de las salidas del conductor en la misma fecha para verificar su jornada maxima
                                                         with open("salidas.txt", "r") as archivo:
                                                             linea = archivo.readline()
 
@@ -1710,6 +1774,7 @@ while option != "3":
 
                                                         horas_conductor += minutos_llegada - minutos_salida
 
+                                                        # verifica que el conductor no supere su jornada maxima y que su licencia no este vencida
                                                         if horas_conductor > jornada_maxima * 60:
                                                             print("El conductor supera su jornada maxima")
 
@@ -1725,6 +1790,7 @@ while option != "3":
                                                                 codigo_salida = "S001"
                                                                 mayor = 0
 
+                                                                # busca el numero de salida mas alto para generar el siguiente codigo automaticamente
                                                                 with open("salidas.txt", "r") as archivo:
                                                                     linea = archivo.readline()
 
@@ -1740,6 +1806,7 @@ while option != "3":
 
                                                                 numero = mayor + 1
 
+                                                                # genera el codigo de salida, crea el registro 
                                                                 if numero < 10:
                                                                     codigo_salida = "S00" + str(numero)
 
@@ -1751,71 +1818,929 @@ while option != "3":
 
                                                                 salida = codigo_salida + ";" + codigo_ruta + ";" + placa + ";" + cedula + ";" + fecha + ";" + hora_salida + ";" + hora_llegada
 
+                                                                # lo guarda en el archivo
                                                                 with open("salidas.txt", "a") as archivo:
                                                                     archivo.write(salida + "\n")
 
-                                                                print("Salida registrada correctamente")
+                                                                print("Salida registrada correctamente")       
 
 
+                                    
+                                #E: Codigo de salida
+                                #S: Archivo de salidas sin la salida seleccionada
+                                #R: La salida no se puede eliminar si tiene abordajes registrados
                                 if admin == "2":
-                                    pass
 
+                                    codigo_salida = input("Codigo de salida a eliminar: ")
+
+                                    # valida que no este vacio 
+                                    if codigo_salida == "":
+                                        print("No se puede eliminar, el codigo no puede quedar vacio")
+
+                                    else:
+
+                                        existe = False
+                                        tiene_abordajes = False
+
+                                        # verifica que lo que se busca esta en el archivo salidas.txt
+                                        with open("salidas.txt", "r") as archivo:
+                                            linea = archivo.readline()
+
+                                            while linea != "":
+                                                datos = linea.strip().split(";")
+
+                                                if codigo_salida == datos[0]:
+                                                    existe = True
+
+                                                linea = archivo.readline()
+
+                                        if existe == False:
+                                            print("La salida no existe")
+
+                                        else:
+
+                                            # valida que el codigo no este asociado
+                                            with open("abordajes.txt", "r") as archivo:
+                                                linea = archivo.readline()
+
+                                                while linea != "":
+                                                    datos = linea.strip().split(";")
+
+                                                    if codigo_salida == datos[2]:
+                                                        tiene_abordajes = True
+
+                                                    linea = archivo.readline()
+
+                                            if tiene_abordajes == True:
+                                                print("La salida tiene abordajes registrados")
+
+                                            else:
+
+                                                nuevo = []
+
+                                                # agrega todas las lineas da una variable excepto la seleccionada 
+                                                with open("salidas.txt", "r") as archivo:
+                                                    linea = archivo.readline()
+
+                                                    while linea != "":
+                                                        datos = linea.strip().split(";")
+
+                                                        if datos[0] != codigo_salida:
+                                                            nuevo += [linea]
+
+                                                        linea = archivo.readline()
+
+                                                # sobre escribe el archivo con la nueva variable
+                                                with open("salidas.txt", "w") as archivo:
+                                                    i = 0
+
+                                                    while i < len(nuevo):
+                                                        archivo.write(nuevo[i])
+                                                        i += 1
+
+                                                print("Salida eliminada")
+                                                
+
+
+
+                                #E: Codigo de salida
+                                #S: Archivo de salidas con los datos modificados
+                                #R: La salida debe cumplir las mismas validaciones al modificar
                                 if admin == "3":
-                                    pass
 
+                                    codigo_salida = input("Codigo de salida a modificar: ")
+
+                                    # verifica que el codigo no quede vacio
+                                    if codigo_salida == "":
+                                        print("No se puede modificar, el codigo no puede quedar vacio")
+
+                                    else:
+
+                                        existe = False
+
+                                        # busca que el codigo de salida en el archivo salida.txt
+                                        with open("salidas.txt", "r") as archivo:
+                                            linea = archivo.readline()
+
+                                            while linea != "":
+                                                datos = linea.strip().split(";")
+
+                                                if codigo_salida == datos[0]:
+                                                    existe = True
+
+                                                linea = archivo.readline()
+
+                                        # no se modifica 
+                                        if existe == False:
+                                            print("La salida no existe")
+
+                                        else:
+
+                                            nuevo = []
+                                            salida_modificada = False
+                                            
+                                            with open("salidas.txt", "r") as archivo:
+                                                linea = archivo.readline()
+
+                                                # si el codigo de la linea es igual al seleccionado modificamos la linea 
+                                                while linea != "":
+                                                    datos = linea.strip().split(";")
+
+                                                    if codigo_salida == datos[0]:
+
+                                                        nuevo_codigo_ruta = input("Nuevo codigo de ruta: ")
+                                                        nueva_placa = input("Nueva placa de la unidad: ")
+                                                        nueva_cedula = input("Nueva cedula del conductor: ")
+                                                        nueva_fecha = input("Nueva fecha: ")
+                                                        nueva_hora_salida = input("Nueva hora de salida: ")
+                                                        nueva_hora_llegada = input("Nueva hora estimada de llegada: ")
+
+                                                        # verificamos que los datos no esten vacios, si no se conserva el anterior 
+                                                        if nuevo_codigo_ruta == "":
+                                                            nuevo_codigo_ruta = datos[1]
+
+                                                        if nueva_placa == "":
+                                                            nueva_placa = datos[2]
+
+                                                        if nueva_cedula == "":
+                                                            nueva_cedula = datos[3]
+
+                                                        if nueva_fecha == "":
+                                                            nueva_fecha = datos[4]
+
+                                                        if nueva_hora_salida == "":
+                                                            nueva_hora_salida = datos[5]
+
+                                                        if nueva_hora_llegada == "":
+                                                            nueva_hora_llegada = datos[6]
+
+
+
+                                                        ruta_existe = False
+                                                        unidad_existe = False
+                                                        conductor_existe = False
+
+                                                        # verifica que la nueva modificacion de la ruta exista
+                                                        with open("rutas.txt", "r") as archivo_rutas:
+                                                            linea_ruta = archivo_rutas.readline()
+
+                                                            while linea_ruta != "":
+                                                                datos_ruta = linea_ruta.strip().split(";")
+
+                                                                if nuevo_codigo_ruta == datos_ruta[0]:
+                                                                    ruta_existe = True
+
+                                                                linea_ruta = archivo_rutas.readline()
+
+
+
+                                                        # verifica que la nueva unudad se encuentre en el archivo
+                                                        with open("unidades.txt", "r") as archivo_unidades:
+                                                            linea_unidad = archivo_unidades.readline()
+
+                                                            while linea_unidad != "":
+                                                                datos_unidad = linea_unidad.strip().split(";")
+
+                                                                if nueva_placa == datos_unidad[0]:
+                                                                    unidad_existe = True
+
+                                                                linea_unidad = archivo_unidades.readline()
+
+
+                                                        jornada_maxima = 0
+                                                        fecha_vencimiento = ""
+
+                                                        # se verifica que la cedula del nuevo conductor exista 
+                                                        with open("conductores.txt", "r") as archivo_conductores:
+                                                            linea_conductor = archivo_conductores.readline()
+
+                                                            while linea_conductor != "":
+                                                                datos_conductor = linea_conductor.strip().split(";")
+
+                                                                if nueva_cedula == datos_conductor[0]:
+                                                                    conductor_existe = True
+                                                                    jornada_maxima = int(datos_conductor[4])
+                                                                    fecha_vencimiento = datos_conductor[3]
+
+                                                                linea_conductor = archivo_conductores.readline()
+
+                                                        # no va permitir modificar si alguno es verdad 
+                                                        if ruta_existe == False:
+                                                            print("La ruta no esta registrada")
+
+                                                        elif unidad_existe == False:
+                                                            print("La unidad no esta registrada")
+
+                                                        elif conductor_existe == False:
+                                                            print("El conductor no esta registrado")
+
+                                                        elif validar_fecha(nueva_fecha) == False:
+                                                            print("La fecha no es valida")
+
+                                                        elif validar_hora(nueva_hora_salida) == False or validar_hora(nueva_hora_llegada) == False:
+                                                            print("La hora no es valida")
+
+                                                        else:
+
+                                                            ## convierte las horas a minutos y verifica que la llegada sea posterior a la salida
+                                                            minutos_salida = int(nueva_hora_salida[0] + nueva_hora_salida[1]) * 60 + int(nueva_hora_salida[3] + nueva_hora_salida[4])
+
+                                                            minutos_llegada = int(nueva_hora_llegada[0] + nueva_hora_llegada[1]) * 60 + int(nueva_hora_llegada[3] + nueva_hora_llegada[4])
+
+                                                            if minutos_llegada <= minutos_salida:
+                                                                print("La hora de llegada debe ser posterior a la hora de salida")
+
+                                                            else:
+
+                                                                traslape_unidad = False
+                                                                traslape_conductor = False
+                                                                # verifica que la nueva unidad y el nuevo conductor no tengan otra salida en el mismo horario
+                                                                with open("salidas.txt", "r") as archivo_salidas:
+                                                                    linea_salida = archivo_salidas.readline()
+
+                                                                    while linea_salida != "":
+                                                                        datos_salida = linea_salida.strip().split(";")
+
+                                                                        if datos_salida[0] != codigo_salida and datos_salida[4] == nueva_fecha:
+
+                                                                            otra_salida = int(datos_salida[5][0] + datos_salida[5][1]) * 60 + int(datos_salida[5][3] + datos_salida[5][4])
+
+                                                                            otra_llegada = int(datos_salida[6][0] + datos_salida[6][1]) * 60 + int(datos_salida[6][3] + datos_salida[6][4])
+
+                                                                            if nueva_placa == datos_salida[2]:
+                                                                                if minutos_salida < otra_llegada and minutos_llegada > otra_salida:
+                                                                                    traslape_unidad = True
+
+                                                                            if nueva_cedula == datos_salida[3]:
+                                                                                if minutos_salida < otra_llegada and minutos_llegada > otra_salida:
+                                                                                    traslape_conductor = True
+
+                                                                        linea_salida = archivo_salidas.readline()
+
+
+
+
+                                                                # no permite modificarlo
+                                                                if traslape_unidad == True:
+                                                                    print("La unidad ya tiene otra salida en ese horario")
+
+                                                                elif traslape_conductor == True:
+                                                                    print("El conductor ya tiene otra salida en ese horario")
+
+                                                                else:
+
+                                                                    horas_conductor = 0
+
+                                                                    # suma las horas de las salidas del nuevo conductor en la misma fecha
+                                                                    with open("salidas.txt", "r") as archivo_salidas:
+                                                                        linea_salida = archivo_salidas.readline()
+
+                                                                        while linea_salida != "":
+                                                                            datos_salida = linea_salida.strip().split(";")
+
+                                                                            if datos_salida[0] != codigo_salida and datos_salida[3] == nueva_cedula and datos_salida[4] == nueva_fecha:
+
+                                                                                salida = int(datos_salida[5][0] + datos_salida[5][1]) * 60 + int(datos_salida[5][3] + datos_salida[5][4])
+
+                                                                                llegada = int(datos_salida[6][0] + datos_salida[6][1]) * 60 + int(datos_salida[6][3] + datos_salida[6][4])
+
+                                                                                horas_conductor += llegada - salida
+
+                                                                            linea_salida = archivo_salidas.readline()
+
+
+
+
+                                                                    horas_conductor += minutos_llegada - minutos_salida
+                                                                    
+                                                                    # verifica que el conductor no supere su jornada maxima diaria
+                                                                    if horas_conductor > jornada_maxima * 60:
+                                                                        print("El conductor supera su jornada maxima")
+
+                                                                    else:
+
+                                                                        # convierte las fechas a numeros y verifica que la licencia del conductor no este vencida
+                                                                        fecha_salida_numero = int(nueva_fecha[6] + nueva_fecha[7] + nueva_fecha[8] + nueva_fecha[9]) * 10000 + int(nueva_fecha[3] + nueva_fecha[4]) * 100 + int(nueva_fecha[0] + nueva_fecha[1])
+
+                                                                        fecha_vencimiento_numero = int(fecha_vencimiento[6] + fecha_vencimiento[7] + fecha_vencimiento[8] + fecha_vencimiento[9]) * 10000 + int(fecha_vencimiento[3] + fecha_vencimiento[4]) * 100 + int(fecha_vencimiento[0] + fecha_vencimiento[1])
+
+                                                                        if fecha_salida_numero > fecha_vencimiento_numero:
+                                                                            print("La licencia del conductor esta vencida")
+
+                                                                        else:
+
+                                                                            salida = codigo_salida + ";" + nuevo_codigo_ruta + ";" + nueva_placa + ";" + nueva_cedula + ";" + nueva_fecha + ";" + nueva_hora_salida + ";" + nueva_hora_llegada + "\n"
+
+                                                                            nuevo += [salida]
+                                                                            salida_modificada = True
+
+                                                    else:
+                                                        nuevo += [linea]
+
+                                                    linea = archivo.readline()
+
+                                            # agrega la variable al archivo; lo hace linea por linea 
+                                            with open("salidas.txt", "w") as archivo:
+                                                i = 0
+
+                                                while i < len(nuevo):
+                                                    archivo.write(nuevo[i])
+                                                    i += 1
+
+                                            if salida_modificada == True:
+                                                print("Salida modificada correctamente")
+
+
+
+
+                                #E: Ninguna
+                                #S: Muestra las salidas
+                                #R: Ninguna
                                 if admin == "4":
-                                    pass
-                            
-                        if option == "17":     
+                                    
+
+                                    with open("salidas.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            print("------------------------------------------")
+                                            print("                  SALIDAS                 ")
+                                            print("------------------------------------------")
+                                            print("Codigo:", datos[0])
+                                            print("Ruta:", datos[1])
+                                            print("Unidad:", datos[2])
+                                            print("Conductor:", datos[3])
+                                            print("Fecha:", datos[4])
+                                            print("Hora de salida:", datos[5])
+                                            print("Hora de llegada:", datos[6])
+                                            print("------------------------------------------")
+                                            print("")
+
+                                            linea = archivo.readline()
+                                                        
+                        while option == "17":     
                             print("")
                             print("==========================================")
                             print("     CONSULTAR HISTORIAL DE ABORDAJES     ")
                             print("==========================================")
-                            print("(1) Incluir")
-                            print("(2) Eliminar")
-                            print("(3) Modificar")
-                            print("(4) Mostrar")
+                            print("(1) Filtrar")
                             print("(5) Atras")
                             print("")
                             admin = input("Digite una opcion: ")
                             print("")
 
-                            if admin != "5":
+                            if admin:
+                                
+                                #E: Filtros de ruta, fecha de salida, rango de fechas de registro y parada de abordaje
+                                #S: Lista de abordajes que cumplen con los filtros y totales de pasajeros y monto
+                                #R: Los filtros pueden quedar vacios y los abordajes deben coincidir con todos los filtros ingresados
                                 if admin == "1":
-                                    pass
 
-                                if admin == "2":
-                                    pass
+                                    ruta_filtro = input("Ruta: ")
+                                    fecha_salida_filtro = input("Fecha de salida: ")
+                                    fecha_inicio = input("Fecha inicial de registro: ")
+                                    fecha_final = input("Fecha final de registro: ")
+                                    parada_filtro = input("Parada de abordaje: ")
 
-                                if admin == "3":
-                                    pass
+                                    total_pasajeros = 0
+                                    total_monto = 0
+                                    encontrados = False
 
-                                if admin == "4":
-                                    pass
+                                    with open("abordajes.txt", "r") as archivo:
+                                        linea = archivo.readline()
+
+                                        while linea != "":
+                                            datos = linea.strip().split(";")
+
+                                            mostrar = True
+
+                                            # busca la informacion de la salida relacionada con el abordaje
+                                            salida_encontrada = False
+                                            ruta = ""
+                                            fecha_salida = ""
+                                            hora_salida = ""
+                                            placa = ""
+                                            cedula = ""
+
+                                            with open("salidas.txt", "r") as archivo_salidas:
+                                                linea_salida = archivo_salidas.readline()
+
+                                                while linea_salida != "":
+                                                    datos_salida = linea_salida.strip().split(";")
+
+                                                    if datos[2] == datos_salida[0]:
+                                                        salida_encontrada = True
+                                                        ruta = datos_salida[1]
+                                                        fecha_salida = datos_salida[4]
+                                                        hora_salida = datos_salida[5]
+                                                        placa = datos_salida[2]
+                                                        cedula = datos_salida[3]
+
+                                                    linea_salida = archivo_salidas.readline()
+
+                                            # verifica el filtro de ruta
+                                            if ruta_filtro != "":
+                                                if ruta_filtro != ruta:
+                                                    mostrar = False
+
+                                            # verifica el filtro de fecha de salida
+                                            if fecha_salida_filtro != "":
+                                                if fecha_salida_filtro != fecha_salida:
+                                                    mostrar = False
+
+                                            # convierte las fechas de registro a numeros para compararlas
+                                            if fecha_inicio != "":
+                                                fecha_inicio_numero = int(fecha_inicio[6] + fecha_inicio[7] + fecha_inicio[8] + fecha_inicio[9]) * 10000 + int(fecha_inicio[3] + fecha_inicio[4]) * 100 + int(fecha_inicio[0] + fecha_inicio[1])
+                                                fecha_registro_numero = int(datos[3][6] + datos[3][7] + datos[3][8] + datos[3][9]) * 10000 + int(datos[3][3] + datos[3][4]) * 100 + int(datos[3][0] + datos[3][1])
+
+                                                if fecha_registro_numero < fecha_inicio_numero:
+                                                    mostrar = False
+
+                                            if fecha_final != "":
+                                                fecha_final_numero = int(fecha_final[6] + fecha_final[7] + fecha_final[8] + fecha_final[9]) * 10000 + int(fecha_final[3] + fecha_final[4]) * 100 + int(fecha_final[0] + fecha_final[1])
+                                                fecha_registro_numero = int(datos[3][6] + datos[3][7] + datos[3][8] + datos[3][9]) * 10000 + int(datos[3][3] + datos[3][4]) * 100 + int(datos[3][0] + datos[3][1])
+
+                                                if fecha_registro_numero > fecha_final_numero:
+                                                    mostrar = False
+
+                                            # verifica el filtro de parada de abordaje
+                                            if parada_filtro != "":
+                                                if parada_filtro != datos[5]:
+                                                    mostrar = False
+
+                                            if mostrar == True:
+
+                                                print("------------------------------------------")
+                                                print("            HISTORIAL DE ABORDAJES       ")
+                                                print("------------------------------------------")
+                                                print("Identificador:", datos[0])
+                                                print("Nombre:", datos[1])
+                                                print("Salida:", datos[2])
+                                                print("Ruta:", ruta)
+                                                print("Fecha de salida:", fecha_salida)
+                                                print("Hora de salida:", hora_salida)
+                                                print("Unidad:", placa)
+                                                print("Conductor:", cedula)
+                                                print("Fecha de registro:", datos[3])
+                                                print("Hora de registro:", datos[4])
+                                                print("Parada de abordaje:", datos[5])
+                                                print("Parada de destino:", datos[6])
+                                                print("Cantidad de pasajeros:", datos[7])
+                                                print("Monto cancelado:", datos[8])
+                                                print("------------------------------------------")
+                                                print("")
+
+                                                total_pasajeros += int(datos[7])
+                                                total_monto += int(datos[8])
+                                                encontrados = True
+
+                                            linea = archivo.readline()
+
+                                    if encontrados == True:
+                                        print("Total de pasajeros:", total_pasajeros)
+                                        print("Monto total acumulado:", total_monto)
+                                    else:
+                                        print("No se encontraron abordajes con los filtros indicados")
+
+
+                                if admin == "5":
+                                    option = "5"
+
+
                                 
                 else:
                     linea = archivo.readline()
             else:
                 if acceso == False:
                     print ("Acceso denegado")
-                    
-    elif option == "2":
-        while option != "24":
-            print("")
-            print("(21) Consulta de salidas")
-            print("(22) Registro de abordaje")
-            print("(23) Anulación de abordaje")
-            print("(24) Regresar al menú principal")
-            print("")
-            option = input("Digite una opcion: ")
-            print("")
 
-            if option == "21":
-                pass
-            elif option == "22":
-                pass
-            elif option == "23":
-                pass
+
+
+
+
+
+
+
+                    
+    while option == "2":
+       
+        print("")
+        print("(21) Consulta de salidas")
+        print("(22) Registro de abordaje")
+        print("(23) Anulación de abordaje")
+        print("(24) Regresar al menú principal")
+        print("")
+        admin = input("Digite una opcion: ")
+        print("")
+
+
+        
+        #E: Filtros de ruta, origen, destino y fecha de salida
+        #S: Lista de salidas que cumplen con los filtros y cantidad de espacios ocupados y disponibles
+        #R: Los filtros pueden quedar vacios y las salidas deben coincidir con todos los filtros ingresados
+        if admin == "21":
+
+            ruta_filtro = input("Ruta: ")
+            origen_filtro = input("Lugar de origen: ")
+            destino_filtro = input("Lugar de destino: ")
+            fecha_filtro = input("Fecha de salida: ")
+
+            encontrados = False
+
+            with open("salidas.txt", "r") as archivo:
+                linea = archivo.readline()
+
+                while linea != "":
+                    datos = linea.strip().split(";")
+
+                    codigo_salida = datos[0]
+                    codigo_ruta = datos[1]
+                    placa = datos[2]
+                    fecha = datos[4]
+                    hora_salida = datos[5]
+                    hora_llegada = datos[6]
+
+                    mostrar = True
+
+                    origen = ""
+                    destino = ""
+                    tarifa = 0
+
+                    # busca la informacion de la ruta
+                    with open("rutas.txt", "r") as archivo_rutas:
+                        linea_ruta = archivo_rutas.readline()
+
+                        while linea_ruta != "":
+                            datos_ruta = linea_ruta.strip().split(";")
+
+                            if codigo_ruta == datos_ruta[0]:
+                                origen = datos_ruta[1]
+                                destino = datos_ruta[2]
+
+                            linea_ruta = archivo_rutas.readline()
+
+                    # verifica el filtro de ruta
+                    if ruta_filtro != "":
+                        if ruta_filtro != codigo_ruta:
+                            mostrar = False
+
+                    # verifica el filtro de origen
+                    if origen_filtro != "":
+                        if origen_filtro != origen:
+                            mostrar = False
+
+                    # verifica el filtro de destino
+                    if destino_filtro != "":
+                        if destino_filtro != destino:
+                            mostrar = False
+
+                    # verifica el filtro de fecha
+                    if fecha_filtro != "":
+                        if fecha_filtro != fecha:
+                            mostrar = False
+
+                    # busca la capacidad de la unidad
+                    capacidad = 0
+
+                    with open("unidades.txt", "r") as archivo_unidades:
+                        linea_unidad = archivo_unidades.readline()
+
+                        while linea_unidad != "":
+                            datos_unidad = linea_unidad.strip().split(";")
+
+                            if placa == datos_unidad[0]:
+                                modelo = datos_unidad[1]
+
+                                with open("modelos.txt", "r") as archivo_modelos:
+                                    linea_modelo = archivo_modelos.readline()
+
+                                    while linea_modelo != "":
+                                        datos_modelo = linea_modelo.strip().split(";")
+
+                                        if modelo == datos_modelo[0]:
+                                            asientos = int(datos_modelo[2])
+                                            espacios_pie = int(datos_modelo[3])
+                                            capacidad = asientos + espacios_pie
+
+                                        linea_modelo = archivo_modelos.readline()
+
+                            linea_unidad = archivo_unidades.readline()
+
+                    # cuenta los pasajeros registrados en la salida
+                    ocupados = 0
+
+                    with open("abordajes.txt", "r") as archivo_abordajes:
+                        linea_abordaje = archivo_abordajes.readline()
+
+                        while linea_abordaje != "":
+                            datos_abordaje = linea_abordaje.strip().split(";")
+
+                            if codigo_salida == datos_abordaje[2]:
+                                ocupados += int(datos_abordaje[7])
+
+                            linea_abordaje = archivo_abordajes.readline()
+
+                    disponibles = capacidad - ocupados
+
+                    if mostrar == True:
+
+                        print("------------------------------------------")
+                        print("            CONSULTA DE SALIDAS           ")
+                        print("------------------------------------------")
+                        print("Numero de salida:", codigo_salida)
+                        print("Ruta:", codigo_ruta)
+                        print("Lugar de origen:", origen)
+                        print("Lugar de destino:", destino)
+                        print("Fecha:", fecha)
+                        print("Hora de salida:", hora_salida)
+                        print("Hora estimada de llegada:", hora_llegada)
+                        print("Placa de la unidad:", placa)
+                        print("Capacidad total:", capacidad)
+                        print("Espacios ocupados:", ocupados)
+                        print("Espacios disponibles:", disponibles)
+                        print("------------------------------------------")
+                        print("")
+
+                        encontrados = True
+
+                    linea = archivo.readline()
+
+            if encontrados == False:
+                print("No se encontraron salidas con los filtros indicados")
+
+
+
+                
+        #E: Numero de salida, nombre, fecha y hora de registro, paradas y cantidad de pasajeros
+        #S: Registro del abordaje guardado en abordajes.txt y comprobante mostrado al usuario
+        #R: La salida y las paradas deben existir, el destino debe ser posterior al abordaje y no se puede superar la capacidad
+        if admin == "22":
+
+            codigo_salida = input("Numero de salida: ")
+            nombre = input("Nombre del pasajero: ")
+            fecha_registro = input("Fecha de registro: ")
+            hora_registro = input("Hora de registro: ")
+            parada_abordaje = input("Numero de parada de abordaje: ")
+            parada_destino = input("Numero de parada de destino: ")
+            cantidad = input("Cantidad de pasajeros: ")
+
+            if codigo_salida == "" or nombre == "" or fecha_registro == "" or hora_registro == "" or parada_abordaje == "" or parada_destino == "" or cantidad == "":
+                print("No se puede registrar el abordaje, ningun campo puede quedar vacio")
+
+            elif validar_fecha(fecha_registro) == False:
+                print("La fecha no es valida")
+
+            elif validar_hora(hora_registro) == False:
+                print("La hora no es valida")
+
+            elif cantidad.isdigit() == False:
+                print("La cantidad de pasajeros no es valida")
+
+            elif int(cantidad) < 1:
+                print("La cantidad de pasajeros debe ser mayor que cero")
+
+            else:
+
+                salida_existe = False
+                ruta = ""
+                fecha_salida = ""
+                hora_salida = ""
+                placa = ""
+
+                # busca la salida seleccionada
+                with open("salidas.txt", "r") as archivo:
+                    linea = archivo.readline()
+
+                    while linea != "":
+                        datos = linea.strip().split(";")
+
+                        if codigo_salida == datos[0]:
+                            salida_existe = True
+                            ruta = datos[1]
+                            placa = datos[2]
+                            fecha_salida = datos[4]
+                            hora_salida = datos[5]
+
+                        linea = archivo.readline()
+
+                if salida_existe == False:
+                    print("La salida no existe")
+
+                else:
+
+                    parada_abordaje_existe = False
+                    parada_destino_existe = False
+                    km_abordaje = 0
+                    km_destino = 0
+                    orden_abordaje = 0
+                    orden_destino = 0
+
+                    # busca las paradas de la ruta seleccionada
+                    with open("paradas.txt", "r") as archivo:
+                        linea = archivo.readline()
+
+                        while linea != "":
+                            datos = linea.strip().split(";")
+
+                            if datos[0] == ruta:
+
+                                if datos[1] == parada_abordaje:
+                                    parada_abordaje_existe = True
+                                    orden_abordaje = int(datos[1])
+                                    km_abordaje = int(datos[3])
+
+                                if datos[1] == parada_destino:
+                                    parada_destino_existe = True
+                                    orden_destino = int(datos[1])
+                                    km_destino = int(datos[3])
+
+                            linea = archivo.readline()
+
+                    if parada_abordaje_existe == False:
+                        print("La parada de abordaje no existe")
+
+                    elif parada_destino_existe == False:
+                        print("La parada de destino no existe")
+
+                    elif orden_destino <= orden_abordaje:
+                        print("La parada de destino debe ser posterior a la parada de abordaje")
+
+                    else:
+
+                        capacidad = 0
+
+                        # busca la capacidad de la unidad
+                        with open("unidades.txt", "r") as archivo:
+                            linea = archivo.readline()
+
+                            while linea != "":
+                                datos = linea.strip().split(";")
+
+                                if datos[0] == placa:
+                                    modelo = datos[1]
+
+                                    with open("modelos.txt", "r") as archivo_modelos:
+                                        linea_modelo = archivo_modelos.readline()
+
+                                        while linea_modelo != "":
+                                            datos_modelo = linea_modelo.strip().split(";")
+
+                                            if datos_modelo[0] == modelo:
+                                                asientos = int(datos_modelo[2])
+                                                espacios_pie = int(datos_modelo[3])
+                                                capacidad = asientos + espacios_pie
+
+                                            linea_modelo = archivo_modelos.readline()
+
+                                linea = archivo.readline()
+
+                        ocupados = 0
+
+                        # suma los pasajeros que ya estan registrados en la salida
+                        with open("abordajes.txt", "r") as archivo:
+                            linea = archivo.readline()
+
+                            while linea != "":
+                                datos = linea.strip().split(";")
+
+                                if datos[2] == codigo_salida:
+                                    ocupados += int(datos[7])
+
+                                linea = archivo.readline()
+
+                        if ocupados + int(cantidad) > capacidad:
+                            print("La cantidad de pasajeros supera la capacidad disponible")
+
+                        else:
+
+                            distancia = km_destino - km_abordaje
+                            tarifa = 0
+
+                            # busca la tarifa de la ruta
+                            with open("rutas.txt", "r") as archivo:
+                                linea = archivo.readline()
+
+                                while linea != "":
+                                    datos = linea.strip().split(";")
+
+                                    if datos[0] == ruta:
+                                        tarifa = int(datos[4])
+
+                                    linea = archivo.readline()
+
+                            monto = tarifa * distancia * int(cantidad)
+
+                            # busca el numero de abordaje mas alto para generar el siguiente codigo
+                            mayor = 0
+
+                            with open("abordajes.txt", "r") as archivo:
+                                linea = archivo.readline()
+
+                                while linea != "":
+                                    datos = linea.strip().split(";")
+
+                                    numero = int(datos[0][1:])
+
+                                    if numero > mayor:
+                                        mayor = numero
+
+                                    linea = archivo.readline()
+
+                            numero = mayor + 1
+
+                            if numero < 10:
+                                identificador = "A00" + str(numero)
+
+                            elif numero < 100:
+                                identificador = "A0" + str(numero)
+
+                            else:
+                                identificador = "A" + str(numero)
+
+                            registro = identificador + ";" + nombre + ";" + codigo_salida + ";" + fecha_registro + ";" + hora_registro + ";" + parada_abordaje + ";" + parada_destino + ";" + cantidad + ";" + str(monto)
+
+                            with open("abordajes.txt", "a") as archivo:
+                                archivo.write(registro + "\n")
+
+                            print("------------------------------------------")
+                            print("          COMPROBANTE DE ABORDAJE        ")
+                            print("------------------------------------------")
+                            print("Identificador:", identificador)
+                            print("Nombre:", nombre)
+                            print("Fecha de registro:", fecha_registro)
+                            print("Hora de registro:", hora_registro)
+                            print("Numero de salida:", codigo_salida)
+                            print("Ruta:", ruta)
+                            print("Unidad:", placa)
+                            print("Parada de abordaje:", parada_abordaje)
+                            print("Parada de destino:", parada_destino)
+                            print("Cantidad de pasajeros:", cantidad)
+                            print("Monto cancelado:", monto)
+                            print("------------------------------------------")
+
+
+                    
+
+        #E: Identificador del abordaje
+        #S: Archivo abordajes.txt sin el abordaje seleccionado
+        #R: El identificador debe existir para poder eliminar el abordaje
+        if admin == "23":
+
+            identificador = input("Identificador del abordaje: ")
+
+            if identificador == "":
+                print("No se puede anular, el identificador no puede quedar vacio")
+
+            else:
+
+                existe = False
+
+                # verifica que el abordaje exista
+                with open("abordajes.txt", "r") as archivo:
+                    linea = archivo.readline()
+
+                    while linea != "":
+                        datos = linea.strip().split(";")
+
+                        if identificador == datos[0]:
+                            existe = True
+
+                        linea = archivo.readline()
+
+                if existe == False:
+                    print("El abordaje no existe")
+
+                else:
+
+                    nuevo = []
+
+                    # guarda todos los abordajes excepto el seleccionado
+                    with open("abordajes.txt", "r") as archivo:
+                        linea = archivo.readline()
+
+                        while linea != "":
+                            datos = linea.strip().split(";")
+
+                            if datos[0] != identificador:
+                                nuevo += [linea]
+
+                            linea = archivo.readline()
+
+                    # reemplaza el archivo con los registros restantes
+                    with open("abordajes.txt", "w") as archivo:
+                        i = 0
+
+                        while i < len(nuevo):
+                            archivo.write(nuevo[i])
+                            i += 1
+
+                    print("Abordaje anulado correctamente")
+
+                
+        if admin == "24":
+            option = "24"
 
 
 
