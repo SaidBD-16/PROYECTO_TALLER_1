@@ -924,7 +924,7 @@ while option != "3":
                             #E: codigo de ruta, lugar de origen, lugar de destino, distancia total en kilómetros y tarifa por kilómetro
                             #S: los datos agregados al archivo de rutas 
                             #R: La cedula no se puede repetir y ningun campo puede estar vacio
-                            if admin != "5":
+                            if admin:
                                 if admin == "1":
                                     codigo_ruta = input("Codigo de ruta: ")
                                     lugar_origen = input("Lugar de origen: ")
@@ -1175,7 +1175,8 @@ while option != "3":
 
                                             linea = archivo.readline()
 
-
+                                if admin == "5":
+                                    option = "5"
 
 
                                 
@@ -2179,7 +2180,14 @@ while option != "3":
                                             print("")
 
                                             linea = archivo.readline()
-                                                        
+
+
+                                if admin == "5":
+                                    option = "5"
+
+
+
+                                    
                         while option == "17":     
                             print("")
                             print("==========================================")
@@ -2327,6 +2335,9 @@ while option != "3":
     while option == "2":
        
         print("")
+        print("==========================================")
+        print("              MENU DE USUARIO             ")
+        print("==========================================")
         print("(21) Consulta de salidas")
         print("(22) Registro de abordaje")
         print("(23) Anulación de abordaje")
@@ -2342,6 +2353,9 @@ while option != "3":
         #R: Los filtros pueden quedar vacios y las salidas deben coincidir con todos los filtros ingresados
         if admin == "21":
 
+            print("==========================================")
+            print("            CONSULTA DE SALIDAS           ")
+            print("==========================================")
             ruta_filtro = input("Ruta: ")
             origen_filtro = input("Lugar de origen: ")
             destino_filtro = input("Lugar de destino: ")
@@ -2478,6 +2492,9 @@ while option != "3":
         #R: La salida y las paradas deben existir, el destino debe ser posterior al abordaje y no se puede superar la capacidad
         if admin == "22":
 
+            print("==========================================")
+            print("            REGISTRO DE ABORDAJE          ")
+            print("==========================================")
             codigo_salida = input("Numero de salida: ")
             nombre = input("Nombre del pasajero: ")
             fecha_registro = input("Fecha de registro: ")
@@ -2688,6 +2705,9 @@ while option != "3":
         #R: El identificador debe existir para poder eliminar el abordaje
         if admin == "23":
 
+            print("==========================================")
+            print("           ANULACION DE ABORDAJE          ")
+            print("==========================================")
             identificador = input("Identificador del abordaje: ")
 
             if identificador == "":

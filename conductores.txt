@@ -1,3 +1,4 @@
-701230456;Luis Mora Vargas;B3;15/11/2027;8
-303450789;Ana Quesada Rojas;B3;02/03/2027;6
-702110334;Carlos Brown Smith;B4;28/09/2028;8
+LIM-SJO;Limón;San José;160;35
+LIM-CAH;Limón;Cahuita;45;40
+LIM-SIQ;Limón;Siquirres;60;38
+
